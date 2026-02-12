@@ -4,9 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OphthoCalc</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to OphthoCalc</h1>
-    <p>Your complete ophthalmology clinical calculator suite.</p>
+    <header>
+        <h1>OphthoCalc - Complete Calculator Application</h1>
+    </header>
+    <main>
+        <section id="calculator1">
+            <h2>Calculator 1</h2>
+            <input type="number" id="input1" placeholder="Enter value">
+            <button onclick="calculate1()">Calculate</button>
+            <p id="result1"></p>
+        </section>
+        <section id="calculator2">
+            <h2>Calculator 2</h2>
+            <input type="number" id="input2" placeholder="Enter value">
+            <button onclick="calculate2()">Calculate</button>
+            <p id="result2"></p>
+        </section>
+        <!-- Add 19 more calculators here in similar way -->
+    </main>
+    <script src="scripts.js"></script>
 </body>
 </html>
