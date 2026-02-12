@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ophthalmology Reference Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .search-section {
+            margin-bottom: 25px;
+        }
+
+        .search-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .source-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .checkbox-wrapper:hover {
+            background: #e9ecef;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 15px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .results-card.show {
+            display: block;
+        }
+
+        .results-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .result-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-source {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .result-link {
+            color: #764ba2;
+            text-decoration: none;
+            font-size: 0.95em;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .result-link:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👁️ Ophthalmology Reference Search</h1>
+            <p>Search across authoritative ophthalmology resources</p>
+        </div>
+
+        <div class="search-card">
+            <div class="search-section">
+                <label for="searchQuery">Enter your search query:</label>
+                <input 
+                    type="text" 
+                    id="searchQuery" 
+                    class="search-input" 
+                    placeholder="e.g., diabetic retinopathy, glaucoma treatment, cataracts..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="search-section">
+                <label>Select sources to search:</label>
+                <div class="source-checkboxes">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="eyewiki" value="eyewiki" checked>
+                        <label for="eyewiki">EyeWiki (AAO)</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="aao" value="aao" checked>
+                        <label for="aao">AAO.org</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="kanski" value="kanski" checked>
+                        <label for="kanski">Kanski Resources</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="pubmed" value="pubmed">
+                        <label for="pubmed">PubMed</label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="search-btn" id="searchBtn" onclick="performSearch()">
+                🔍 Search References
+            </button>
+
+            <div class="info-box">
+                <strong>Tip:</strong> This tool searches multiple ophthalmology resources to help you find relevant clinical information. Select your preferred sources and enter specific terms for best results.
+            </div>
+        </div>
+
+        <div class="results-card" id="resultsCard">
+            <h2 class="results-title">Search Results</h2>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Handle Enter key press
+        document.getElementById('searchQuery').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        async function performSearch() {
+            const query = document.getElementById('searchQuery').value.trim();
+            
+            if (!query) {
+                alert('Please enter a search query');
+                return;
+            }
+
+            // Get selected sources
+            const sources = [];
+            document.querySelectorAll('.checkbox-wrapper input:checked').forEach(checkbox => {
+                sources.push(checkbox.value);
+            });
+
+            if (sources.length === 0) {
+                alert('Please select at least one source to search');
+                return;
+            }
+
+            const resultsCard = document.getElementById('resultsCard');
+            const resultsContent = document.getElementById('resultsContent');
+            const searchBtn = document.getElementById('searchBtn');
+
+            // Show loading state
+            resultsCard.classList.add('show');
+            resultsContent.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Searching ophthalmology resources...</p>
+                </div>
+            `;
+            searchBtn.disabled = true;
+
+            try {
+                const results = await searchResources(query, sources);
+                displayResults(results, query);
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div class="result-item">
+                        <div class="result-source">Error</div>
+                        <p>An error occurred while searching. Please try again.</p>
+                    </div>
+                `;
+            } finally {
+                searchBtn.disabled = false;
+            }
+        }
+
+        async function searchResources(query, sources) {
+            const results = [];
+
+            for (const source of sources) {
+                let searchUrl = '';
+                let sourceName = '';
+
+                switch(source) {
+                    case 'eyewiki':
+                        searchUrl = `https://eyewiki.aao.org/w/index.php?search=${encodeURIComponent(query)}`;
+                        sourceName = 'EyeWiki (AAO)';
+                        break;
+                    case 'aao':
+                        searchUrl = `https://www.aao.org/search?query=${encodeURIComponent(query)}`;
+                        sourceName = 'American Academy of Ophthalmology';
+                        break;
+                    case 'kanski':
+                        searchUrl = `https://www.google.com/search?q=${encodeURIComponent('Kanski Clinical Ophthalmology ' + query)}`;
+                        sourceName = 'Kanski Clinical Ophthalmology';
+                        break;
+                    case 'pubmed':
+                        searchUrl = `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query + ' ophthalmology')}`;
+                        sourceName = 'PubMed';
+                        break;
+                }
+
+                results.push({
+                    source: sourceName,
+                    url: searchUrl,
+                    query: query
+                });
+            }
+
+            return results;
+        }
+
+        function displayResults(results, query) {
+            const resultsContent = document.getElementById('resultsContent');
+            
+            let html = `<p style="margin-bottom: 20px; color: #666;">Found ${results.length} resource(s) for: <strong>"${query}"</strong></p>`;
+
+            results.forEach(result => {
+                html += `
+                    <div class="result-item">
+                        <div class="result-source">${result.source}</div>
+                        <p>Click the link below to search this resource:</p>
+                        <a href="${result.url}" target="_blank" class="result-link">
+                            🔗 Open ${result.source} search results
+                        </a>
+                    </div>
+                `;
+            });
+
+            resultsContent.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
